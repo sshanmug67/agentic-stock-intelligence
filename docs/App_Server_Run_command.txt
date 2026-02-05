@@ -1,0 +1,10 @@
+#To run backend.
+cd stock_intelligence_pipeline\backend
+(D:\Git-Proj\GitHub\agentic_stock_intelligence\stock_intelligence_pipeline\backend)
+.venv\Scripts\activate.ps1
+cd ..
+(D:\Git-Proj\GitHub\agentic_stock_intelligence\stock_intelligence_pipeline)
+uv run python -m backend.main
+
+
+#To run Front End.
