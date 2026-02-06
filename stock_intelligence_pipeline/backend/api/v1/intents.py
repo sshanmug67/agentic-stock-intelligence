@@ -1,65 +1,59 @@
 """
 Intent execution endpoints
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from ...models.intent import IntentRequest, IntentResponse, IntentType
+from fastapi import APIRouter, HTTPException, status
+from typing import List
+
+from ...models.intent import (
+    IntentRequest, 
+    IntentResponse, 
+    IntentType,
+)
+
 from ...models.execution import ExecutionStatus
 from ...graph.execution.tracker import execution_tracker
-from ...graph.intents.analyze_stock import AnalyzeStockIntent
+
+# Import the task from intent file (NEW!)
+from ...graph.intents.analyze_stock import analyze_stock_task
 
 router = APIRouter()
 
-
-async def execute_intent_background(execution_id: str, intent_type: str, parameters: dict):
-    """Execute intent in background"""
-    try:
-        # Route to appropriate intent handler
-        if intent_type == IntentType.ANALYZE_STOCK:
-            intent = AnalyzeStockIntent(execution_tracker)
-            result = await intent.execute(execution_id, parameters)
-            execution_tracker.complete_execution(execution_id, True, result)
-        else:
-            raise ValueError(f"Intent type not implemented: {intent_type}")
-            
-    except Exception as e:
-        print(f"❌ Execution {execution_id} failed: {str(e)}")
-        execution_tracker.complete_execution(execution_id, False, error=str(e))
-
-
 @router.post("/intents/execute", response_model=IntentResponse)
-async def execute_intent(request: IntentRequest, background_tasks: BackgroundTasks):
+async def execute_intent(request: IntentRequest):
     """
-    Execute an intent
-    
-    Available intents:
-    - analyze_stock: Analyze a single stock symbol
-    - compare_stocks: Compare multiple stocks (coming soon)
-    - market_scan: Scan market for opportunities (coming soon)
+    Execute an intent using Celery
     """
     try:
-        # Start execution tracking
+        # Create execution record
         execution_id = execution_tracker.start_execution(
             request.intent_type.value,
             request.parameters
         )
         
-        # Execute in background
-        background_tasks.add_task(
-            execute_intent_background,
-            execution_id,
-            request.intent_type.value,
-            request.parameters
-        )
+        print(f"📍 Intent execution requested: {execution_id}")
+
+        # Route to appropriate task (NEW!)
+        if request.intent_type == IntentType.ANALYZE_STOCK:
+            task = analyze_stock_task.delay(execution_id, request.parameters)
+        else:
+            raise HTTPException(400, f"Intent type not implemented: {request.intent_type}")
+
+        print(f"✅ Task sent to Celery: {task.id}")
         
         return IntentResponse(
             execution_id=execution_id,
             intent_type=request.intent_type.value,
             status=ExecutionStatus.RUNNING.value,
-            message=f"Intent {request.intent_type.value} started successfully"
+            message=f"Intent {request.intent_type.value} started successfully",
+            celery_task_id=task.id
         )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"❌ Failed to start intent: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 
 @router.get("/intents/types")

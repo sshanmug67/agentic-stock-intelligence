@@ -1,0 +1,91 @@
+# ============================================================================
+# Stock Intelligence Pipeline - Application Configuration
+# ============================================================================
+# Location: stock_intelligence_pipeline/config/app_config.yaml
+#
+# IMPORTANT: This file may contain secrets (API keys).
+#            Add to .gitignore: config/app_config.yaml
+#            Use app_config.example.yaml as a template for others.
+# ============================================================================
+
+# --- Application ---
+app:
+  name: "Stock Intelligence Pipeline"
+  environment: "development"    # development | staging | production
+  debug: true
+  log_level: "INFO"             # DEBUG | INFO | WARNING | ERROR
+
+# --- API Server ---
+api:
+  host: "0.0.0.0"
+  port: 8000
+  prefix: "/api/v1"
+
+# --- CORS ---
+cors:
+  origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+
+# --- Redis ---
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null                # Set if Redis requires authentication
+
+# --- Celery ---
+celery:
+  broker_url: null              # Defaults to Redis URL if null
+  result_backend: null          # Defaults to Redis URL if null
+
+# --- Supabase ---
+supabase:
+  url: null
+  key: null
+  service_key: null
+
+# --- LLM ---
+llm:
+  openai_api_key: null
+  model: "GPT-4o-mini"
+
+# --- Stock Data APIs ---
+stock_apis:
+  alpha_vantage_key: null
+  finnhub_key: null
+  twelve_data_key: null
+  fmp_key: null                 # Financial Modeling Prep
+
+# --- YFinance (no key needed) ---
+yfinance:
+  enabled: true
+  cache_ttl: 300                # Cache ticker data for 5 minutes
+  request_timeout: 30           # Timeout in seconds
+
+# --- Agent Configuration ---
+agents:
+  fundamental:
+    enabled: true
+    default_depth: "deep"       # "quick" = ratios only, "deep" = full statements
+
+  technical:
+    enabled: true
+    price_period: "1y"          # 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, max
+    price_interval: "1d"        # 1m, 5m, 15m, 30m, 1h, 1d, 1wk, 1mo
+
+  news:
+    enabled: true
+    lookback_days: 30           # How far back to search for news
+    max_articles: 50            # Max articles to analyze
+
+  aggregation:
+    enabled: true
+    use_llm: false              # Start without LLM, enable when API key is set
+
+# --- Execution Settings ---
+execution:
+  ttl_seconds: 86400            # 24 hours - how long results stay in Redis
+  max_concurrent: 10            # Max simultaneous executions
+  task_timeout: 3600            # 1 hour - hard kill
+  soft_timeout: 3000            # 50 min - graceful warning

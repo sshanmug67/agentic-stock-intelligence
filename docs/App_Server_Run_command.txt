@@ -1,10 +1,37 @@
 #To run backend.
+
+
+Terminal 1: Start Redis
+docker run -d -p 6379:6379 --name redis redis:7-alpine
+
+open powershell and check whether docker is running:
+docker ps
+
+
+docker start redis 
+        
+        
+        
+
+Terminal 2: Start Celery Worker
+cd stock_intelligence_pipeline\backend
+(D:\Git-Proj\GitHub\agentic_stock_intelligence\stock_intelligence_pipeline\backend)
+.venv\Scripts\activate.ps1
+cd ..
+cd stock_intelligence_pipeline
+uv run celery -A backend.celery_app worker --loglevel=info --pool=solo
+
+
+Terminal 3: Start FastAPI
 cd stock_intelligence_pipeline\backend
 (D:\Git-Proj\GitHub\agentic_stock_intelligence\stock_intelligence_pipeline\backend)
 .venv\Scripts\activate.ps1
 cd ..
 (D:\Git-Proj\GitHub\agentic_stock_intelligence\stock_intelligence_pipeline)
 uv run python -m backend.main
+
+To check whether Fast API is running: Open powershell
+netstat -ano | findstr :8000
 
 
 #To run Front End.

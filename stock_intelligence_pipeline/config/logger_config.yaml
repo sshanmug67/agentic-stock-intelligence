@@ -1,0 +1,17 @@
+# Logger Configuration
+# Control which special loggers are enabled/disabled
+# Location: stock_intelligence_pipeline/config/logger_config.yaml
+
+special_loggers:
+  # Agent execution logs
+  agent_execution: true
+  fundamental_agent: true
+  technical_agent: true
+  news_agent: true
+  
+  # System logs
+  celery_tasks: true
+  api_requests: true
+  
+  # Set to false to disable specific loggers
+  # example_disabled_logger: false

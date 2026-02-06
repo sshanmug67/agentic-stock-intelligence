@@ -1,0 +1,60 @@
+# ============================================================================
+# Stock Intelligence Pipeline - Application Configuration (TEMPLATE)
+# ============================================================================
+# Copy this file to app_config.yaml and fill in your values:
+#   cp app_config.example.yaml app_config.yaml
+# ============================================================================
+
+# --- Application ---
+app:
+  name: "Stock Intelligence Pipeline"
+  environment: "development"
+  debug: true
+  log_level: "INFO"
+
+# --- API Server ---
+api:
+  host: "0.0.0.0"
+  port: 8000
+  prefix: "/api/v1"
+
+# --- CORS ---
+cors:
+  origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+
+# --- Redis ---
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null
+
+# --- Celery ---
+celery:
+  broker_url: null
+  result_backend: null
+
+# --- Supabase ---
+supabase:
+  url: "your-supabase-url-here"
+  key: "your-supabase-key-here"
+  service_key: "your-service-key-here"
+
+# --- LLM ---
+llm:
+  openai_api_key: "your-openai-key-here"
+  model: "GPT-4o-mini"
+
+# --- Stock Data APIs ---
+stock_apis:
+  alpha_vantage_key: "your-key-here"
+  finnhub_key: "your-key-here"
+  twelve_data_key: "your-key-here"
+  fmp_key: "your-key-here"
+
+# --- YFinance (no key needed) ---
+yfinance:
+  cache_ttl: 300
+  request_timeout: 30
